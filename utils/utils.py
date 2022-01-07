@@ -1,5 +1,6 @@
 from typing import List
 
+english_dictionary = ["award","ratio","urine","irate","igloo","banal"]
 
 def check_green(input_word: str, target_word: str) -> List[int]:
     """
@@ -45,7 +46,6 @@ def check_grey(input_word: str, target_word: str) -> List[int]:
     """
     common_indices = check_yellow(input_word, target_word)
     return list(set(range(len(input_word))).difference(set(common_indices)))
-
 
 if __name__ == "__main__":
     print(check_grey("banal", "banal"))
