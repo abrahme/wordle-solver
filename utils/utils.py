@@ -1,6 +1,7 @@
+import urllib.request
 from typing import List
 
-english_dictionary = ["award","ratio","urine","irate","igloo","banal"]
+english_dictionary = urllib.request.urlopen("https://www-cs-faculty.stanford.edu/~knuth/sgb-words.txt").read().decode().split("\n")
 
 def check_green(input_word: str, target_word: str) -> List[int]:
     """

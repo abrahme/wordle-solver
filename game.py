@@ -20,7 +20,7 @@ class WordleGame(object):
         self.target_word = target_word.lower()
         self.rounds = 0  ## initialize how many rounds have been played
         self.max_rounds = round_max  ### number of total allowed rounds
-        self.won = False ### checks to see if we won
+        self.won = False  ### checks to see if we won
 
     def check_word(self, input_word: str) -> Dict:
         """
@@ -68,6 +68,7 @@ class WordleGame(object):
             print("Enter a guess:")
             self.play_round(input())
 
+
 if __name__ == "__main__":
-    wordle_game = WordleGame("banal",6)
+    wordle_game = WordleGame("banal", 6)
     wordle_game.play_game()
