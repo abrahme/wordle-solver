@@ -1,9 +1,11 @@
 import urllib.request
-from typing import List
+from typing import List, Dict
 
-english_dictionary = urllib.request.urlopen("https://www-cs-faculty.stanford.edu/~knuth/sgb-words.txt").read().decode().split("\n")
+english_dictionary = urllib.request.urlopen(
+    "https://www-cs-faculty.stanford.edu/~knuth/sgb-words.txt").read().decode().split("\n")
 
-def check_green(input_word: str, target_word: str) -> List[int]:
+
+def _check_green(input_word: str, target_word: str) -> List[int]:
     """
     input_word: "balls"
     target_word: "blues"
@@ -19,36 +21,47 @@ def check_green(input_word: str, target_word: str) -> List[int]:
     return match_index
 
 
-def check_yellow(input_word: str, target_word: str) -> List[int]:
+def color_leters(input_word: str, target_word: str) -> Dict:
     """
-    input_word: "balls"
-    target_word: "blues"
-    output: [0,2,3,4]
+
     :param input_word: string of word to check
     :param target_word: string of word to check against
-    :return: list of which indices are common
+    :return: dictionary of color to list of indices
     """
-    common_indices = []
-    for index, character in enumerate(input_word):
-        if character in target_word:
-            common_indices.append(index)
-    return common_indices
+    green_indices = _check_green(input_word, target_word)
 
+    #### color indices
+    letter_dict = {}
+    input_word_list = list(input_word)
+    target_word_list = list(target_word)
+    for index in green_indices:
+        input_word_list[index] = "_"
+        target_word_list[index] = "_"
+        if input_word[index] not in letter_dict:
+            letter_dict[input_word[index]] = {"green": [index]}
+        else:
+            letter_dict[input_word[index]]["green"] += [index]
 
-def check_grey(input_word: str, target_word: str) -> List[int]:
-    """
-    returns complement of check_yellow
-    input_word: "balls"
-    target_word: "blues"
-    output: [1]
-    :param input_word: string to check
-    :param target_word: string to check against
-    :return: list of indices are not common
-    """
-    common_indices = check_yellow(input_word, target_word)
-    return list(set(range(len(input_word))).difference(set(common_indices)))
+    for ind, character in enumerate(input_word_list):
+        if character == "_":
+            continue
+        if character in letter_dict:
+            if character not in target_word_list:
+                continue
+            else:
+                if "yellow" in letter_dict[character]:
+                    letter_dict[character]["yellow"] += [ind]
+                else:
+                    letter_dict[character]["yellow"] = [ind]
+                target_word_list[target_word_list.index(character)] = "_"
+        else:
+            if character not in target_word_list:
+                letter_dict[character] = {"grey": [ind]}
+            else:
+                letter_dict[character] = {"yellow": [ind]}
+                target_word_list[target_word_list.index(character)] = "_"
+    return letter_dict
+
 
 if __name__ == "__main__":
-    print(check_grey("banal", "banal"))
-    print(check_green("banal", "banal"))
-    print(check_yellow("banal", "banal"))
+    print(color_leters("areas", "banal"))
