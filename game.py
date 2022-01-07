@@ -1,5 +1,5 @@
 from typing import Dict
-from utils.utils import check_green, check_grey, check_yellow, english_dictionary
+from utils.utils import color_leters, english_dictionary
 
 
 class WordleGame(object):
@@ -28,9 +28,7 @@ class WordleGame(object):
         :param input_word: string of word to check
         :return: dictionary of green, yellow, and grey indices
         """
-        return {"green": check_green(input_word, self.target_word),
-                "yellow": check_yellow(input_word, self.target_word),
-                "grey": check_grey(input_word, self.target_word)}
+        return color_leters(input_word,self.target_word)
 
     def play_round(self, input_word: str):
         input_word = input_word.lower()
@@ -42,16 +40,19 @@ class WordleGame(object):
         yellow_letters = blank_letters.copy()
         grey_letters = blank_letters.copy()
 
-        for green_index in color_checks["green"]:
-            green_letters[green_index] = input_word[green_index]
+        for letter in color_checks:
+            if "green" in color_checks[letter]:
+                for index in color_checks[letter]["green"]:
+                    green_letters[index] = letter
+            elif "yellow" in color_checks[letter]:
+                for index in color_checks[letter]["yellow"]:
+                    yellow_letters[index] = letter
+            elif "grey" in color_checks[letter]:
+                for index in color_checks[letter]["grey"]:
+                    grey_letters[index] = letter
+
         green_letters_str = " ".join(green_letters)
-
-        for grey_index in color_checks["grey"]:
-            grey_letters[grey_index] = input_word[grey_index]
         grey_letters_str = " ".join(grey_letters)
-
-        for yellow_index in color_checks["yellow"]:
-            yellow_letters[yellow_index] = input_word[yellow_index]
         yellow_letters_str = " ".join(yellow_letters)
 
         print(f"Letters in the correct spot: {green_letters_str}")
@@ -60,7 +61,11 @@ class WordleGame(object):
 
         self.rounds += 1
         print(f"Round {self.rounds}")
-        if len(color_checks["green"]) == 5:
+        green_letters = 0
+        for letter in color_checks:
+            if "green" in color_checks[letter]:
+                green_letters += len(color_checks[letter]["green"])
+        if green_letters == 5:
             self.won = True
             print("Congrats! You guessed the right word!")
 
