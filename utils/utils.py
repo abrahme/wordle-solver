@@ -131,7 +131,6 @@ def filter_words(input_word: str, target_word: str, corpus: List[str]) -> List[s
     for (character, index) in grey_letter_index:
         reg_builder_list[index] = "[^" + "".join(grey_letters + [character]) + "]"
     reg_filter = "".join(reg_builder_list)
-    print(reg_filter)
     match_filter_list = list(filter(lambda word: bool(re.search(reg_filter, word)), corpus))
 
     ### now filter out words without the correct number of letters of green/yellow vars
