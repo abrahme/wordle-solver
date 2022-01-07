@@ -34,6 +34,8 @@ class WordleGame(object):
 
     def play_round(self, input_word: str):
         input_word = input_word.lower()
+        assert len(input_word) == 5, "Only 5 letter words allowed"
+        assert input_word in english_dictionary, "Must be a viable English word"
         color_checks = self.check_word(input_word)
         blank_letters = ["_", "_", "_", "_", "_"]
         green_letters = blank_letters.copy()
@@ -66,7 +68,11 @@ class WordleGame(object):
         print("Welcome to wordle!")
         while not self.won and self.rounds < self.max_rounds:
             print("Enter a guess:")
-            self.play_round(input())
+            try:
+                self.play_round(input())
+            except AssertionError as e:
+                print(e)
+                print("Try again!")
 
 
 if __name__ == "__main__":
