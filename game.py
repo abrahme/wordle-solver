@@ -1,5 +1,5 @@
 from typing import Dict
-from utils.utils import color_leters, english_dictionary
+from utils.utils import color_leters, filter_words, english_dictionary
 
 
 class WordleGame(object):
@@ -21,6 +21,7 @@ class WordleGame(object):
         self.rounds = 0  ## initialize how many rounds have been played
         self.max_rounds = round_max  ### number of total allowed rounds
         self.won = False  ### checks to see if we won
+        self.corpus = english_dictionary
 
     def check_word(self, input_word: str) -> Dict:
         """
@@ -55,6 +56,9 @@ class WordleGame(object):
         grey_letters_str = " ".join(grey_letters)
         yellow_letters_str = " ".join(yellow_letters)
 
+        print("Possible words left")
+        self.corpus = filter_words(input_word,self.target_word,self.corpus)
+        print(self.corpus)
         print(f"Letters in the correct spot: {green_letters_str}")
         print(f"Common letters: {yellow_letters_str}")
         print(f"Uncommon letters: {grey_letters_str}")

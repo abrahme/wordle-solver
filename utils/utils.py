@@ -48,7 +48,10 @@ def color_leters(input_word: str, target_word: str) -> Dict:
             continue
         if character in letter_dict:
             if character not in target_word_list:
-                continue
+                if "grey" in letter_dict[character]:
+                    letter_dict[character]["grey"] += [ind]
+                else:
+                    letter_dict[character]["grey"] = [ind]
             else:
                 if "yellow" in letter_dict[character]:
                     letter_dict[character]["yellow"] += [ind]
@@ -84,7 +87,7 @@ def filter_words(input_word: str, target_word: str, corpus: List[str]) -> List[s
     """
     color_checks = color_leters(input_word, target_word)
 
-    color_tuples = [(word, color, index[0]) for (word, color, index) in _unnest(color_checks)]
+    color_tuples = [(word, color, i) for (word, color, index) in _unnest(color_checks) for i in index]
 
     reg_builder_list = ["_"] * 5
     ### collect uncommon letters
@@ -93,18 +96,8 @@ def filter_words(input_word: str, target_word: str, corpus: List[str]) -> List[s
         if color_tuple[1] == "grey":
             grey_letters.append(color_tuple[0])
 
-    # collect letter which is an extra, but should be yellow for example "anna" vs "banal", the first n in "annal" is extra
-    grey_letter_index = []
-    for index in range(len(input_word)):
-        match = 0
-        for color_tuple in color_tuples:
-            if color_tuple[2] == index:
-                match += 1
-                break
-        if match == 0:
-            grey_letter_index.append((input_word[index], index))
-
     grey_letters = list(set(grey_letters))
+    print(grey_letters)
 
     ## build regex for basic positional filtering
     for index in range(len(input_word)):
@@ -128,8 +121,6 @@ def filter_words(input_word: str, target_word: str, corpus: List[str]) -> List[s
             else:
                 reg_builder_list[index] = "[^" + "".join(grey_letters + [input_word[index]]) + "]"
 
-    for (character, index) in grey_letter_index:
-        reg_builder_list[index] = "[^" + "".join(grey_letters + [character]) + "]"
     reg_filter = "".join(reg_builder_list)
     match_filter_list = list(filter(lambda word: bool(re.search(reg_filter, word)), corpus))
 
@@ -157,7 +148,5 @@ def filter_words(input_word: str, target_word: str, corpus: List[str]) -> List[s
     return match_filter_list
 
 
-
-
 if __name__ == "__main__":
-    print(filter_words("award", "banal", english_dictionary))
+    print(filter_words("alarm", "banal", english_dictionary))
