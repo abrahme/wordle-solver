@@ -1,6 +1,6 @@
+from utils.filter import Filter
+from utils.utils import get_letter_colors, english_dictionary
 from typing import Dict
-from utils.utils import color_leters, filter_words, english_dictionary
-
 
 class WordleGame(object):
     """
@@ -22,34 +22,27 @@ class WordleGame(object):
         self.max_rounds = round_max  ### number of total allowed rounds
         self.won = False  ### checks to see if we won
         self.corpus = english_dictionary
-
-    def check_word(self, input_word: str) -> Dict:
-        """
-
-        :param input_word: string of word to check
-        :return: dictionary of green, yellow, and grey indices
-        """
-        return color_leters(input_word,self.target_word)
+        self.filter = Filter(target_word, english_dictionary)
 
     def play_round(self, input_word: str):
         input_word = input_word.lower()
         assert len(input_word) == 5, "Only 5 letter words allowed"
         assert input_word in english_dictionary, "Must be a viable English word"
-        color_checks = self.check_word(input_word)
+        letter_colors = get_letter_colors(input_word, self.target_word)
         blank_letters = ["_", "_", "_", "_", "_"]
         green_letters = blank_letters.copy()
         yellow_letters = blank_letters.copy()
         grey_letters = blank_letters.copy()
 
-        for letter in color_checks:
-            if "green" in color_checks[letter]:
-                for index in color_checks[letter]["green"]:
+        for letter in letter_colors:
+            if "green" in letter_colors[letter]:
+                for index in letter_colors[letter]["green"]:
                     green_letters[index] = letter
-            elif "yellow" in color_checks[letter]:
-                for index in color_checks[letter]["yellow"]:
+            elif "yellow" in letter_colors[letter]:
+                for index in letter_colors[letter]["yellow"]:
                     yellow_letters[index] = letter
-            elif "grey" in color_checks[letter]:
-                for index in color_checks[letter]["grey"]:
+            elif "grey" in letter_colors[letter]:
+                for index in letter_colors[letter]["grey"]:
                     grey_letters[index] = letter
 
         green_letters_str = " ".join(green_letters)
@@ -57,7 +50,7 @@ class WordleGame(object):
         yellow_letters_str = " ".join(yellow_letters)
 
         print("Possible words left")
-        self.corpus = filter_words(input_word,self.target_word,self.corpus)
+        self.corpus = self.filter.filter_words(letter_colors)
         print(self.corpus)
         print(f"Letters in the correct spot: {green_letters_str}")
         print(f"Common letters: {yellow_letters_str}")
@@ -66,9 +59,9 @@ class WordleGame(object):
         self.rounds += 1
         print(f"Round {self.rounds}")
         green_letters = 0
-        for letter in color_checks:
-            if "green" in color_checks[letter]:
-                green_letters += len(color_checks[letter]["green"])
+        for letter in letter_colors:
+            if "green" in letter_colors[letter]:
+                green_letters += len(letter_colors[letter]["green"])
         if green_letters == 5:
             self.won = True
             print("Congrats! You guessed the right word!")
