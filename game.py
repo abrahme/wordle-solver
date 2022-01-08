@@ -26,7 +26,7 @@ class WordleGame(object):
         self.filter = Filter(target_word, ENGLISH_DICTIONARY)
 
     def play_round(self, input_word: str):
-        input_word = input_word.lower()
+        input_word = input_word.lower().strip()
         assert len(input_word) == NUM_LETTERS, f"Only { NUM_LETTERS } letter words allowed"
         assert input_word in ENGLISH_DICTIONARY, "Must be a viable English word"
         letter_colors = get_letter_colors(input_word, self.target_word)

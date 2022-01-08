@@ -27,41 +27,30 @@ def get_letter_colors(input_word: str, target_word: str) -> Dict:
     :param target_word: string of word to check against
     :return: dictionary of letter to color to list of indices
     """
+    
     green_indices = __check_green(input_word, target_word)
-
-    #### color indices
-    letter_dict = {}
+    letter_dict = defaultdict(lambda: defaultdict(list))
     input_word_list = list(input_word)
     target_word_list = list(target_word)
+
+    ### Match all the green indices first
     for index in green_indices:
         input_word_list[index] = "_"
         target_word_list[index] = "_"
-        if input_word[index] not in letter_dict:
-            letter_dict[input_word[index]] = {COLORS.green : [index]}
-        else:
-            letter_dict[input_word[index]][COLORS.green] += [index]
+        currentChar = input_word[index]
+        letter_dict[currentChar][COLORS.green] += [index]
 
+    ### Match yellow and grey indices
     for ind, character in enumerate(input_word_list):
         if character == "_":
             continue
-        if character in letter_dict:
-            if character not in target_word_list:
-                if COLORS.grey in letter_dict[character]:
-                    letter_dict[character][COLORS.grey] += [ind]
-                else:
-                    letter_dict[character][COLORS.grey] = [ind]
-            else:
-                if COLORS.yellow in letter_dict[character]:
-                    letter_dict[character][COLORS.yellow] += [ind]
-                else:
-                    letter_dict[character][COLORS.yellow] = [ind]
-                target_word_list[target_word_list.index(character)] = "_"
+
+        if character not in target_word_list:
+            letter_dict[character][COLORS.grey] += [ind]
         else:
-            if character not in target_word_list:
-                letter_dict[character] = {COLORS.grey: [ind]}
-            else:
-                letter_dict[character] = {COLORS.yellow: [ind]}
-                target_word_list[target_word_list.index(character)] = "_"
+            letter_dict[character][COLORS.yellow] += [ind]
+            target_word_list[target_word_list.index(character)] = "_"
+
     return letter_dict
 
 
