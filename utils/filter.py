@@ -1,6 +1,7 @@
 import re
 
-from utils.utils import get_letter_colors, english_dictionary, _unnest
+from utils.common import NUM_LETTERS, COLORS
+from utils.utils import get_letter_colors, _unnest
 from typing import List, Dict
 
 class Filter(object):
@@ -20,23 +21,23 @@ class Filter(object):
 	    indexed_letter_colors = [(word, color, i) for (word, color, index) in _unnest(letter_colors) for i in index]
 	    indexed_letter_colors.sort(key=lambda tup: tup[2])
 
-	    ### Initialize regex as five sections, one for each character in the word
-	    reg_builder_list = ["."] * 5
+	    ### Initialize regex as NUM_LETTERS sections, one for each character in the word
+	    reg_builder_list = ["."] * NUM_LETTERS
 
 	    ### Collect uncommon letters
 	    grey_letters = []
 	    for (character, color, _) in indexed_letter_colors:
-	        if color == "grey":
+	        if color == COLORS.grey:
 	            grey_letters.append(character)
 	    grey_letters = list(set(grey_letters))
 
 	    ### Build regex for basic positional filtering
 	    ### Note that this does not yet account for the presence of yellow letters
 	    for (letter, color, index) in indexed_letter_colors:
-	        if color == "green":
+	        if color == COLORS.green:
 	        	### Index must be green letter
 	        	reg_builder = letter
-	        elif color == "yellow":
+	        elif color == COLORS.yellow:
 	        	### Index must NOT be grey or yellow letters
 	        	reg_builder = "[^" + "".join(grey_letters + [letter]) + "]"
 	        else:
@@ -64,7 +65,7 @@ class Filter(object):
 	        keep_list = []
 	        character_count = 0
 	        for color in letter_colors[character]:
-	            if color != "grey":
+	            if color != COLORS.grey:
 	                character_count += len(letter_colors[character][color])
 	        for word in letter_count_filter_result:
 	            word_dict = {}
