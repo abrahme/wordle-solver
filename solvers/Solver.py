@@ -73,5 +73,36 @@ class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
         for index, word in enumerate(corpus):
             corpus_matrix[:, index] = np.squeeze(self.__word_to_vec(word))
 
-        avg_similarity_unnormalized = np.mean(1 - cdist(corpus_matrix.T, corpus_matrix.T, "cosine"), axis=1, keepdims=True)
+        avg_similarity_unnormalized = np.mean(1 - cdist(corpus_matrix.T, corpus_matrix.T, "cosine"), axis=1,
+                                              keepdims=True)
         return avg_similarity_unnormalized / np.sum(avg_similarity_unnormalized)
+
+
+class FrequencyMaxWordleSolver(AbstractWordleSolver, ABC):
+
+    def __init__(self):
+        super().__init__()
+        self.letters = np.asarray(list(string.ascii_lowercase))
+
+    def freq_generator(self, corpus: List[str]) -> np.array:
+        letter_frequencies = np.zeros([5, 26])  # initialize
+        for i in corpus:
+            for j in np.arange(len(i)):
+                letter_frequencies[j, np.where(i[j] == self.letters)] += 1
+        return letter_frequencies
+
+    def word_scorer(self, corpus: List[str], letter_frequencies: np.array) -> str:
+        scores_array = []
+        for i in corpus:
+            total_score = 0
+            for j in np.arange(len(i)):
+                letter_score = letter_frequencies[j, np.where(i[j] == self.letters)]
+                total_score = total_score + letter_score
+            scores_array.append(total_score)
+        best_word_index = np.argmax(scores_array)
+        return corpus[best_word_index]
+
+    def choose_word(self, corpus: List[str]) -> str:
+        freq = self.freq_generator(corpus)
+        output = self.word_scorer(corpus, freq)
+        return output
