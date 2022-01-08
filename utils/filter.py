@@ -74,7 +74,6 @@ class Filter(object):
             if "grey" in letter_colors[character] and "yellow" not in letter_colors[character]:
                 grey_letters.append(character)
         grey_letters = list(set(grey_letters))
-
         ### Build regex for basic positional filtering
         ### Note that this does not yet account for the presence of yellow letters
         for (letter, color, index) in indexed_letter_colors:
@@ -84,9 +83,9 @@ class Filter(object):
             elif color == "yellow":
                 ### Index must NOT be grey or yellow letters
                 reg_builder = "[^" + "".join(grey_letters + [letter]) + "]"
-            else:
+            elif color == "grey":
                 ### Index must NOT be grey letters
-                reg_builder = "[^" + "".join(grey_letters) + "]"
+                reg_builder = "[^" + "".join(grey_letters if grey_letters else grey_letters + [letter]) + "]"
 
             reg_builder_list[index] = reg_builder
 

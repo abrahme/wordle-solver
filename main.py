@@ -14,6 +14,7 @@ def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
     while not game_object.game_over:
         guess_no = game_object.rounds
         guess = solver.choose_word(game_object.corpus)
+        # print(guess)
         game_object.play_round(guess)
         game_dict[guess_no] = guess
     game_dict["solved"] = game_object.won
@@ -21,6 +22,21 @@ def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
 
 
 if __name__ == "__main__":
-    wordle_game = WordleGame("slump",6)
-    wordle_solver = RandomMethodWordleSolver()
-    print(solve_game(wordle_solver, wordle_game))
+
+    simulation_results = []
+    num_simulations = 100000
+    solved = 0
+    path_length = []
+    for _ in range(num_simulations):
+        wordle_game = WordleGame("ladle", 6)
+        wordle_solver = RandomMethodWordleSolver()
+        game_solution = solve_game(wordle_solver, wordle_game)
+        if game_solution["solved"]:
+            solved += 1
+        path_length.append(len(game_solution)-1)
+        simulation_results.append(game_solution)
+
+    print(f"Percentage solved: {solved/num_simulations}")
+    print(f"Average path length: {sum(path_length)/num_simulations}")
+
+

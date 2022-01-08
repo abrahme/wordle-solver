@@ -23,7 +23,7 @@ class WordleGame(object):
         self.max_rounds = round_max  ### number of total allowed rounds
         self.won = False  ### checks to see if we won
         self.game_over = False  ### check to see if game is over
-        self.corpus = english_dictionary
+        self.corpus = english_dictionary.copy()
         self.filter = Filter(target_word, english_dictionary)
 
     def play_round(self, input_word: str):
@@ -51,17 +51,17 @@ class WordleGame(object):
         grey_letters_str = " ".join(grey_letters)
         yellow_letters_str = " ".join(yellow_letters)
 
-        print("Possible words left")
+        # print("Possible words left")
         self.corpus = self.filter.filter_words(input_word)
-        print(self.corpus)
-        print(f"Letters in the correct spot: {green_letters_str}")
-        print(f"Common letters: {yellow_letters_str}")
-        print(f"Uncommon letters: {grey_letters_str}")
+        # print(self.corpus)
+        # print(f"Letters in the correct spot: {green_letters_str}")
+        # print(f"Common letters: {yellow_letters_str}")
+        # print(f"Uncommon letters: {grey_letters_str}")
 
         self.rounds += 1
         if self.rounds > self.max_rounds:
             self.game_over = True
-        print(f"Round {self.rounds}")
+        # print(f"Round {self.rounds}")
         green_letters = 0
         for letter in letter_colors:
             if "green" in letter_colors[letter]:
@@ -69,7 +69,7 @@ class WordleGame(object):
         if green_letters == 5:
             self.won = True
             self.game_over = True
-            print("Congrats! You guessed the right word!")
+            # print("Congrats! You guessed the right word!")
 
     def play_game(self):
         print("Welcome to wordle!")
@@ -83,5 +83,5 @@ class WordleGame(object):
 
 
 if __name__ == "__main__":
-    wordle_game = WordleGame("banal", 6)
+    wordle_game = WordleGame("arise", 6)
     wordle_game.play_game()

@@ -1,8 +1,8 @@
-import urllib.request
 from typing import List
 
-english_dictionary = [word for word in urllib.request.urlopen(
-    "https://www-cs-faculty.stanford.edu/~knuth/sgb-words.txt").read().decode().split("\n") if len(word) == 5]
+with open("utils/words.txt",'rb') as f:
+    english_dictionary = [word for word in f.read().decode().strip().split("\n") if len(word) == 5]
+f.close()
 
 
 def _check_green(input_word: str, target_word: str) -> List[int]:
