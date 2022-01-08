@@ -1,4 +1,4 @@
-from solvers.Solver import AbstractWordleSolver, RandomMethodWordleSolver
+from solvers.Solver import AbstractWordleSolver, LetterCountWordSimilaritySolver
 from typing import Dict
 from game import WordleGame
 
@@ -11,32 +11,31 @@ def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
     :return: dictionary of status of game after done playing
     """
     game_dict = {}
+    round_dict = {}
     while not game_object.game_over:
         guess_no = game_object.rounds
         guess = solver.choose_word(game_object.corpus)
-        # print(guess)
         game_object.play_round(guess)
-        game_dict[guess_no] = guess
+        round_dict[guess_no] = guess
     game_dict["solved"] = game_object.won
+    game_dict["round_results"] = round_dict
     return game_dict
 
 
 if __name__ == "__main__":
 
-    simulation_results = []
-    num_simulations = 100000
-    solved = 0
-    path_length = []
-    for _ in range(num_simulations):
-        wordle_game = WordleGame("ladle", 6)
-        wordle_solver = RandomMethodWordleSolver()
+    from utils.utils import english_dictionary
+    full_corpus = english_dictionary
+    solutions = {}
+    for word in english_dictionary:
+        wordle_game = WordleGame(word, 6)
+        wordle_solver = LetterCountWordSimilaritySolver()
         game_solution = solve_game(wordle_solver, wordle_game)
-        if game_solution["solved"]:
-            solved += 1
-        path_length.append(len(game_solution)-1)
-        simulation_results.append(game_solution)
+        print(game_solution)
+        solutions[word] = game_solution
 
-    print(f"Percentage solved: {solved/num_simulations}")
-    print(f"Average path length: {sum(path_length)/num_simulations}")
+
+
+
 
 
