@@ -11,8 +11,8 @@ def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
     :return: dictionary of status of game after done playing
     """
     game_dict = {}
+    round_dict = {}
     while not game_object.game_over:
-        round_dict = {}
         guess_no = game_object.rounds
         guess = solver.choose_word(game_object.corpus)
         game_object.play_round(guess)
