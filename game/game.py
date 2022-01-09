@@ -46,22 +46,11 @@ class WordleGame(object):
             elif "grey" in letter_colors[letter]:
                 for index in letter_colors[letter]["grey"]:
                     grey_letters[index] = letter
-
-        green_letters_str = " ".join(green_letters)
-        grey_letters_str = " ".join(grey_letters)
-        yellow_letters_str = " ".join(yellow_letters)
-
-        # print("Possible words left")
         self.corpus = self.filter.filter_words(input_word)
-        # print(self.corpus)
-        # print(f"Letters in the correct spot: {green_letters_str}")
-        # print(f"Common letters: {yellow_letters_str}")
-        # print(f"Uncommon letters: {grey_letters_str}")
 
         self.rounds += 1
         if self.rounds > self.max_rounds:
             self.game_over = True
-        # print(f"Round {self.rounds}")
         green_letters = 0
         for letter in letter_colors:
             if "green" in letter_colors[letter]:
@@ -69,7 +58,6 @@ class WordleGame(object):
         if green_letters == 5:
             self.won = True
             self.game_over = True
-            # print("Congrats! You guessed the right word!")
 
     def play_game(self):
         print("Welcome to wordle!")

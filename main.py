@@ -1,6 +1,6 @@
 from solvers.Solver import AbstractWordleSolver, LetterCountWordSimilaritySolver
 from typing import Dict
-from game import WordleGame
+from game.game import WordleGame
 
 
 def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
