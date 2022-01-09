@@ -2,6 +2,7 @@ import string
 import numpy as np
 from numpy.random import choice
 from scipy.spatial.distance import cdist
+from scipy.sparse import csr_matrix
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -28,14 +29,19 @@ class RandomMethodWordleSolver(AbstractWordleSolver, ABC):
 
 
 class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
-    def __init__(self, is_random=False):
+
+    def __init__(self, corpus:List[str], is_random=False):
         """
 
         :param is_random: if we pick the most optimal word with probability
         """
         super().__init__()
+        self.corpus = corpus #### full corpus
+        self.corpus_map = {word:index for index,word in enumerate(corpus)}
         self.is_random = is_random
         self.alphabet = {letter: index for index, letter in enumerate(string.ascii_lowercase)}
+        print("Initiating similarity matrix ....")
+        self.similarity_matrix = self.compute_word_similarity_corpus(self.corpus)
 
     def choose_word(self, corpus: List[str]) -> str:
         """
@@ -43,13 +49,13 @@ class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
         :param corpus: list of possible words to choose from
         :return: best word based on the word which is most similar to all other words
         """
-        avg_similarity = np.squeeze(self.__compute_word_similarity_corpus(corpus))
+        avg_similarity = np.mean(self.return_word_similarity(corpus), axis=1)
         if self.is_random:
             return choice(corpus, 1, p=avg_similarity)[0]
         else:
             return corpus[np.argmax(avg_similarity)]
 
-    def __word_to_vec(self, input_word: str) -> np.array:
+    def word_to_vec(self, input_word: str) -> np.array:
         """
 
         :param input_word: n letter word
@@ -60,22 +66,67 @@ class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
             word_vec[self.alphabet[letter], 0] += 1
         return word_vec
 
-    def __compute_word_similarity_corpus(self, corpus: List[str]) -> np.array:
+    def compute_word_similarity_corpus(self, corpus: List[str]) -> np.array:
         """
 
         :param corpus: list of string of possible words
-        :return: len(corpus) x 1 np.array of average similarity between word and all other words
+        :return: len(corpus) x len(corpus) np.array of similarity between word and all other words
         """
 
+            ### same size corpus, so first time seeing it as initialized
         n = len(corpus)
         corpus_matrix = np.zeros((26, n))
 
         for index, word in enumerate(corpus):
-            corpus_matrix[:, index] = np.squeeze(self.__word_to_vec(word))
+            corpus_matrix[:, index] = np.squeeze(self.word_to_vec(word))
 
-        avg_similarity_unnormalized = np.mean(1 - cdist(corpus_matrix.T, corpus_matrix.T, "cosine"), axis=1,
-                                              keepdims=True)
-        return avg_similarity_unnormalized / np.sum(avg_similarity_unnormalized)
+        similarity_unnormalized = 1 - cdist(corpus_matrix.T, corpus_matrix.T, "cosine")
+        return similarity_unnormalized
+
+    def return_word_similarity(self, corpus:List[str]) -> np.array:
+        """
+
+        :param corpus: list of str
+        :return: similarities
+        """
+        keep_indices = [self.corpus_map[word] for word in corpus]
+        val = self.similarity_matrix[np.ix_(keep_indices,keep_indices)]
+        return val
+
+
+class PositionalSimilarityWordleSolver(LetterCountWordSimilaritySolver, ABC):
+    """
+    similarity measure based on position of letter so "black" and "bland" are similar but "black" and "balls" are less
+    """
+
+    def compute_word_similarity_corpus(self, corpus: List[str]) -> np.array:
+        """
+
+        :param corpus: list of str of words to compute similarity
+        :return: len(corpus) * len(corpus) matrix
+        """
+        n = len(corpus)
+        word_length = len(corpus[0])
+        sim_mat = np.zeros((n, n))
+        for index, word in enumerate(corpus):
+            for index_2, word_2 in enumerate(corpus):
+                if index > index_2:
+                    sim_mat[index,index_2] = np.sum(self.word_to_vec(word_2) * self.word_to_vec(word))/word_length
+        sim_mat += sim_mat.T
+        sim_mat += np.eye(n)
+        return sim_mat
+
+    def word_to_vec(self, input_word: str) -> np.array:
+        """
+
+        :param input_word: n letter string
+        :return: n x 26 binary array representing the word
+        """
+        n = len(input_word)
+        vec = np.zeros((n, 26))
+        for index, character in enumerate(input_word):
+            vec[index, self.alphabet[character]] = 1
+        return vec
 
 
 class FrequencyMaxWordleSolver(AbstractWordleSolver, ABC):

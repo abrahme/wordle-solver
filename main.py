@@ -1,4 +1,4 @@
-from solvers.Solver import AbstractWordleSolver, LetterCountWordSimilaritySolver
+from solvers.Solver import AbstractWordleSolver, LetterCountWordSimilaritySolver, PositionalSimilarityWordleSolver
 from typing import Dict
 from game import WordleGame
 
@@ -26,13 +26,15 @@ if __name__ == "__main__":
 
     from utils.utils import english_dictionary
     full_corpus = english_dictionary
+    wordle_solver = PositionalSimilarityWordleSolver(english_dictionary)
     solutions = {}
     for word in english_dictionary:
         wordle_game = WordleGame(word, 6)
-        wordle_solver = LetterCountWordSimilaritySolver()
+
         game_solution = solve_game(wordle_solver, wordle_game)
         print(game_solution)
         solutions[word] = game_solution
+        break
 
 
 
