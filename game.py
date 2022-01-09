@@ -51,12 +51,12 @@ class WordleGame(object):
         grey_letters_str = " ".join(grey_letters)
         yellow_letters_str = " ".join(yellow_letters)
 
-        # print("Possible words left")
+        print("Possible words left")
         self.corpus = self.filter.filter_words(input_word)
-        # print(self.corpus)
-        # print(f"Letters in the correct spot: {green_letters_str}")
-        # print(f"Common letters: {yellow_letters_str}")
-        # print(f"Uncommon letters: {grey_letters_str}")
+        print(self.corpus)
+        print(f"Letters in the correct spot: {green_letters_str}")
+        print(f"Common letters: {yellow_letters_str}")
+        print(f"Uncommon letters: {grey_letters_str}")
 
         self.rounds += 1
         if self.rounds > self.max_rounds:
@@ -83,5 +83,5 @@ class WordleGame(object):
 
 
 if __name__ == "__main__":
-    wordle_game = WordleGame("arise", 6)
+    wordle_game = WordleGame("sissy", 6)
     wordle_game.play_game()
