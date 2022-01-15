@@ -30,14 +30,14 @@ class RandomMethodWordleSolver(AbstractWordleSolver, ABC):
 
 class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
 
-    def __init__(self, corpus:List[str], is_random=False):
+    def __init__(self, corpus: List[str], is_random=False):
         """
 
         :param is_random: if we pick the most optimal word with probability
         """
         super().__init__()
-        self.corpus = corpus #### full corpus
-        self.corpus_map = {word:index for index,word in enumerate(corpus)}
+        self.corpus = corpus  #### full corpus
+        self.corpus_map = {word: index for index, word in enumerate(corpus)}
         self.is_random = is_random
         self.alphabet = {letter: index for index, letter in enumerate(string.ascii_lowercase)}
         print("Initiating similarity matrix ....")
@@ -73,7 +73,7 @@ class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
         :return: len(corpus) x len(corpus) np.array of similarity between word and all other words
         """
 
-            ### same size corpus, so first time seeing it as initialized
+        ### same size corpus, so first time seeing it as initialized
         n = len(corpus)
         corpus_matrix = np.zeros((26, n))
 
@@ -83,14 +83,14 @@ class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):
         similarity_unnormalized = 1 - cdist(corpus_matrix.T, corpus_matrix.T, "cosine")
         return similarity_unnormalized
 
-    def return_word_similarity(self, corpus:List[str]) -> np.array:
+    def return_word_similarity(self, corpus: List[str]) -> np.array:
         """
 
         :param corpus: list of str
         :return: similarities
         """
         keep_indices = [self.corpus_map[word] for word in corpus]
-        val = self.similarity_matrix[np.ix_(keep_indices,keep_indices)]
+        val = self.similarity_matrix[np.ix_(keep_indices, keep_indices)]
         return val
 
 
@@ -109,9 +109,8 @@ class PositionalSimilarityWordleSolver(LetterCountWordSimilaritySolver, ABC):
         word_length = len(corpus[0])
         sim_mat = np.zeros((n, n))
         for index, word in enumerate(corpus):
-            for index_2, word_2 in enumerate(corpus):
-                if index > index_2:
-                    sim_mat[index,index_2] = np.sum(self.word_to_vec(word_2) * self.word_to_vec(word))/word_length
+            for index_2, word_2 in enumerate(corpus[index+1:]):
+                sim_mat[index, index_2 + index +1] = np.sum(self.word_to_vec(word_2) * self.word_to_vec(word)) / word_length
         sim_mat += sim_mat.T
         sim_mat += np.eye(n)
         return sim_mat
@@ -127,6 +126,38 @@ class PositionalSimilarityWordleSolver(LetterCountWordSimilaritySolver, ABC):
         for index, character in enumerate(input_word):
             vec[index, self.alphabet[character]] = 1
         return vec
+
+
+class MixedWordleSolver(LetterCountWordSimilaritySolver, ABC):
+    def __init__(self, solvers: List[LetterCountWordSimilaritySolver],is_random = False):
+        """
+
+        :param solvers: which solvers we are combining
+        """
+        self.is_random = is_random
+        self.solvers = solvers
+        self.similarity_matrix = 1
+        self.corpus = self.solvers[0].corpus  #### full corpus
+        self.corpus_map = self.solvers[0].corpus_map
+        self.alphabet = self.solvers[0].alphabet
+        for solver in solvers:
+            self.similarity_matrix *= solver.similarity_matrix
+
+    def compute_word_similarity_corpus(self, corpus: List[str]) -> np.array:
+        """
+        not implemented
+        :param corpus:
+        :return:
+        """
+        raise AttributeError("MixedWordleSolver has no attribute 'compute_word_similarity_corpus'")
+
+    def word_to_vec(self, input_word: str) -> np.array:
+        """
+        not implemented
+        :param input_word:
+        :return:
+        """
+        raise AttributeError("MixedWordleSolver has no attribute 'word_to_vec'")
 
 
 class FrequencyMaxWordleSolver(AbstractWordleSolver, ABC):
