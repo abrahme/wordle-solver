@@ -41,7 +41,6 @@ class WordleGame(object):
         green_letters[letter_colors == 2] = input_word_vec[letter_colors == 2]
         grey_letters[letter_colors == 0] = input_word_vec[letter_colors == 0]
         yellow_letters[letter_colors == 1] = input_word_vec[letter_colors == 1]
-
         green_letters_str = " ".join(green_letters.tolist())
         grey_letters_str = " ".join(grey_letters.tolist())
         yellow_letters_str = " ".join(yellow_letters.tolist())
@@ -73,5 +72,5 @@ class WordleGame(object):
 
 
 if __name__ == "__main__":
-    wordle_game = WordleGame("arise", 6)
+    wordle_game = WordleGame("sissy", 6)
     wordle_game.play_game()
