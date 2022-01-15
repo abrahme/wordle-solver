@@ -1,3 +1,4 @@
+import numpy as np
 from utils.filter import Filter
 from utils.utils import english_dictionary
 
@@ -30,46 +31,35 @@ class WordleGame(object):
         input_word = input_word.lower()
         assert len(input_word) == 5, "Only 5 letter words allowed"
         assert input_word in english_dictionary, "Must be a viable English word"
-        letter_colors = self.filter.get_letter_colors(input_word)
-        blank_letters = ["_", "_", "_", "_", "_"]
+        input_word_vec = np.asarray(list(input_word))
+        letter_colors = self.filter.assign_colors(input_word)
+        blank_letters = np.asarray(["_"] * len(input_word))
         green_letters = blank_letters.copy()
         yellow_letters = blank_letters.copy()
         grey_letters = blank_letters.copy()
 
-        for letter in letter_colors:
-            if "green" in letter_colors[letter]:
-                for index in letter_colors[letter]["green"]:
-                    green_letters[index] = letter
-            elif "yellow" in letter_colors[letter]:
-                for index in letter_colors[letter]["yellow"]:
-                    yellow_letters[index] = letter
-            elif "grey" in letter_colors[letter]:
-                for index in letter_colors[letter]["grey"]:
-                    grey_letters[index] = letter
+        green_letters[letter_colors == 2] = input_word_vec[letter_colors == 2]
+        grey_letters[letter_colors == 0] = input_word_vec[letter_colors == 0]
+        yellow_letters[letter_colors == 1] = input_word_vec[letter_colors == 1]
 
-        green_letters_str = " ".join(green_letters)
-        grey_letters_str = " ".join(grey_letters)
-        yellow_letters_str = " ".join(yellow_letters)
+        green_letters_str = " ".join(green_letters.tolist())
+        grey_letters_str = " ".join(grey_letters.tolist())
+        yellow_letters_str = " ".join(yellow_letters.tolist())
 
-        # print("Possible words left")
-        self.corpus = self.filter.filter_words(input_word)
-        # print(self.corpus)
-        # print(f"Letters in the correct spot: {green_letters_str}")
-        # print(f"Common letters: {yellow_letters_str}")
-        # print(f"Uncommon letters: {grey_letters_str}")
-
+        print("Possible words left")
+        self.corpus = self.filter.filter_words(self.filter.update(input_word, letter_colors))
+        print(self.corpus)
+        print(f"Letters in the correct spot: {green_letters_str}")
+        print(f"Common letters: {yellow_letters_str}")
+        print(f"Uncommon letters: {grey_letters_str}")
         self.rounds += 1
         if self.rounds > self.max_rounds:
             self.game_over = True
-        # print(f"Round {self.rounds}")
-        green_letters = 0
-        for letter in letter_colors:
-            if "green" in letter_colors[letter]:
-                green_letters += len(letter_colors[letter]["green"])
-        if green_letters == 5:
+        print(f"Round {self.rounds}")
+        if np.sum(letter_colors == 2) == 5:
             self.won = True
             self.game_over = True
-            # print("Congrats! You guessed the right word!")
+            print("Congrats! You guessed the right word!")
 
     def play_game(self):
         print("Welcome to wordle!")
