@@ -63,7 +63,7 @@ class Filter(object):
                     min_count[letter] = max(min_count[letter], len(letter_response)) if letter in min_count else \
                         len(letter_response)
                 else:
-                    known_count[letter] = np.sum(letter_response >= 0)
+                    known_count[letter] = np.sum(letter_response != 0)
         return {"min_count": min_count, "exact_count": known_count, "exact": exact, "wrong_spot": wrong_spot}
 
     def filter_words(self, update_dict: Dict) -> List[str]:
@@ -95,6 +95,7 @@ class Filter(object):
         for letter in exact_count:
             regex_filter_list = [word for word in regex_filter_list if word.count(letter) == exact_count[letter]]
 
+        self.corpus = regex_filter_list
         return regex_filter_list
 
 

@@ -1,6 +1,6 @@
 import numpy as np
+from typing import List
 from utils.filter import Filter
-from utils.utils import english_dictionary
 
 
 class WordleGame(object):
@@ -8,7 +8,7 @@ class WordleGame(object):
     just a way to play the game
     """
 
-    def __init__(self, target_word: str, round_max: int):
+    def __init__(self, target_word: str, round_max: int, dictionary: List[str]):
         """
 
         :param target_word: 5 letter word in english dictionary
@@ -16,7 +16,7 @@ class WordleGame(object):
         """
 
         assert len(target_word) == 5, "Only 5 letter words allowed"
-        assert target_word in english_dictionary, "Must be a viable English word"
+        assert target_word in dictionary, "Must be a viable English word"
         assert isinstance(round_max, int), "Number of rounds must be an integer"
         assert round_max >= 1, "Number of rounds must be greater than or equal to 1"
         self.target_word = target_word.lower()
@@ -24,13 +24,14 @@ class WordleGame(object):
         self.max_rounds = round_max  ### number of total allowed rounds
         self.won = False  ### checks to see if we won
         self.game_over = False  ### check to see if game is over
-        self.corpus = english_dictionary.copy()
-        self.filter = Filter(target_word, english_dictionary)
+        self.dictionary = dictionary.copy()
+        self.corpus = dictionary.copy()
+        self.filter = Filter(target_word, self.dictionary)
 
     def play_round(self, input_word: str):
         input_word = input_word.lower()
         assert len(input_word) == 5, "Only 5 letter words allowed"
-        assert input_word in english_dictionary, "Must be a viable English word"
+        assert input_word in self.dictionary, "Must be a viable English word"
         input_word_vec = np.asarray(list(input_word))
         letter_colors = self.filter.assign_colors(input_word)
         blank_letters = np.asarray(["_"] * len(input_word))
@@ -42,24 +43,24 @@ class WordleGame(object):
         grey_letters[letter_colors == 0] = input_word_vec[letter_colors == 0]
         yellow_letters[letter_colors == 1] = input_word_vec[letter_colors == 1]
 
-        green_letters_str = " ".join(green_letters.tolist())
-        grey_letters_str = " ".join(grey_letters.tolist())
-        yellow_letters_str = " ".join(yellow_letters.tolist())
-
-        print("Possible words left")
+        # green_letters_str = " ".join(green_letters.tolist())
+        # grey_letters_str = " ".join(grey_letters.tolist())
+        # yellow_letters_str = " ".join(yellow_letters.tolist())
+        #
+        # print("Possible words left")
         self.corpus = self.filter.filter_words(self.filter.update(input_word, letter_colors))
-        print(self.corpus)
-        print(f"Letters in the correct spot: {green_letters_str}")
-        print(f"Common letters: {yellow_letters_str}")
-        print(f"Uncommon letters: {grey_letters_str}")
+        # print(self.corpus)
+        # print(f"Letters in the correct spot: {green_letters_str}")
+        # print(f"Common letters: {yellow_letters_str}")
+        # print(f"Uncommon letters: {grey_letters_str}")
         self.rounds += 1
         if self.rounds > self.max_rounds:
             self.game_over = True
-        print(f"Round {self.rounds}")
+        # print(f"Round {self.rounds}")
         if np.sum(letter_colors == 2) == 5:
             self.won = True
             self.game_over = True
-            print("Congrats! You guessed the right word!")
+            # print("Congrats! You guessed the right word!")
 
     def play_game(self):
         print("Welcome to wordle!")
@@ -73,5 +74,7 @@ class WordleGame(object):
 
 
 if __name__ == "__main__":
-    wordle_game = WordleGame("arise", 6)
+    from utils.utils import english_dictionary
+    print(english_dictionary[0:10])
+    wordle_game = WordleGame("rebut", 6, english_dictionary[0:10])
     wordle_game.play_game()
