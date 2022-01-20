@@ -24,7 +24,7 @@ class RandomMethodWordleSolver(AbstractWordleSolver, ABC):
         super().__init__()
 
     def choose_word(self, corpus: List[str]) -> str:
-        return choice(corpus, 1)
+        return choice(corpus, 1)[0]
 
 
 class LetterCountWordSimilaritySolver(AbstractWordleSolver, ABC):

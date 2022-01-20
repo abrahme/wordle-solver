@@ -1,10 +1,18 @@
-import json
-from tqdm import tqdm
 from typing import Dict, List
 from game.game import WordleGame
 from utils.utils import english_dictionary
-from solvers.Solver import AbstractWordleSolver, \
-    LetterCountWordSimilaritySolver, PositionalSimilarityWordleSolver, MixedWordleSolver
+from solvers.Solver import AbstractWordleSolver, RandomMethodWordleSolver
+
+
+def solve_game_wrapper(target_word: str) -> Dict:
+    """
+    wrapper around solve game method that creates a new game object
+    :param target_word:
+    :return:
+    """
+    wordle_game = WordleGame(target_word, 6, english_dictionary)
+    solver = RandomMethodWordleSolver()
+    return solve_game(solver, wordle_game)
 
 
 def solve_game(solver: AbstractWordleSolver, game_object: WordleGame) -> Dict:
@@ -40,18 +48,3 @@ def solve_all(solvers: Dict, rounds: int, dictionary: List[str], target_word: st
         solver_results = solve_game(solvers[solver], wordle_game)
         word_results[solver] = solver_results
     return word_results
-
-
-if __name__ == "__main__":
-    lcw_solver = LetterCountWordSimilaritySolver(english_dictionary)
-    psw_solver = PositionalSimilarityWordleSolver(english_dictionary)
-    mix_solver = MixedWordleSolver([psw_solver, lcw_solver])
-    solver_dict = {"psw": psw_solver, "mix": mix_solver, "lcw": lcw_solver}
-    num_rounds = 6
-    results = {}
-    for word in tqdm(english_dictionary):
-        results[word] = solve_all(solver_dict, num_rounds, english_dictionary, word)
-
-    with open("saved_models/results.json","w") as f:
-        json.dump(results,f)
-    f.close()
