@@ -2,7 +2,6 @@ import string
 import numpy as np
 from numpy.random import choice
 from scipy.spatial.distance import cdist
-from scipy.sparse import csr_matrix
 from abc import ABC, abstractmethod
 from typing import List
 
